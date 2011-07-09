@@ -4,6 +4,7 @@
    The getbootstate tool
    <p>
    Copyright (C) 2007-2010 Nokia Corporation.
+   Copyright (C) 2011      Pali Rohár <pali.rohar@gmail.com>
 
    @author Peter De Schrijver <peter.de-schrijver@nokia.com>
    @author Semi Malinen <semi.malinen@nokia.com>
@@ -32,6 +33,9 @@
 #include <errno.h>
 #include <stdbool.h>
 #include <time.h>
+#include <fcntl.h>
+#include <cal.h>
+#include <asm/ioctl.h>
 
 #define MAX_BOOTREASON_LEN   40
 #define MAX_REBOOT_COUNT_LEN 40
@@ -65,9 +69,24 @@
 #define BOOT_MODE_NORMAL     "normal"
 
 #define DEFAULT_CMDLINE_PATH "/proc/cmdline"
-#define MAX_CMDLINE_LEN      1024
+#define BOOT_REASON_PATH     "/proc/bootreason"
+#define COMPONENT_PATH       "/proc/component_version"
+#define MAX_LINE_LEN         1024
 
 #define GETBOOTSTATE_PREFIX "getbootstate: "
+
+
+// TWL_4030_MADC definitions from kernel module twl4030-madc.c
+#define TWL4030_MADC_PATH              "/dev/twl4030-adc"
+#define TWL4030_MADC_IOC_MAGIC         '`'
+#define TWL4030_MADC_IOCX_ADC_RAW_READ _IO(TWL4030_MADC_IOC_MAGIC, 0)
+
+struct twl4030_madc_user_parms {
+    int channel;
+    int average;
+    int status;
+    unsigned short int result;
+};
 
 
 static bool forcemode = false;
@@ -85,7 +104,7 @@ static int get_cmd_line_value(char* get_value, int max_len, char* key)
 {
     const char* cmdline_path;
     FILE*       cmdline_file;
-    char        cmdline[MAX_CMDLINE_LEN];
+    char        cmdline[MAX_LINE_LEN];
     int         ret = -1;
     int         keylen;
     char*       key_and_value;
@@ -100,7 +119,7 @@ static int get_cmd_line_value(char* get_value, int max_len, char* key)
         return -1;
     }
 
-    if (fgets(cmdline, MAX_CMDLINE_LEN, cmdline_file)) {
+    if (fgets(cmdline, MAX_LINE_LEN, cmdline_file)) {
         key_and_value = strtok(cmdline, " ,");
         keylen = strlen(key);
         while (key_and_value != NULL) {
@@ -120,14 +139,139 @@ static int get_cmd_line_value(char* get_value, int max_len, char* key)
     return ret;
 }
 
+// Behaviour from fremantle binary version:
+// bootmode is read from file /proc/component_version
+// file structure: <key> <spaces> <value>
+//                 boot-mode <spaces> <bootmode>
 static int get_bootmode(char* bootmode, int max_len)
 {
-    return get_cmd_line_value(bootmode, max_len, "bootmode=");
+    FILE* file;
+    char  line[MAX_LINE_LEN];
+    int   ret = -1;
+    int   cmd;
+    char* value;
+    char* last;
+
+    // Try also harmattan behaviour
+    cmd = get_cmd_line_value(bootmode, max_len, "bootmode=");
+    if (cmd == 0)
+        return 0;
+
+    file = fopen(COMPONENT_PATH, "r");
+    if (!file) {
+        log_msg("Could not open " COMPONENT_PATH " - %s\n", strerror(errno));
+        return -1;
+    }
+
+    while (fgets(line, MAX_LINE_LEN, file)) {
+        if (strncmp(line, "boot-mode", strlen("boot-mode")) == 0) {
+            value = line + strlen("boot-mode");
+            while (*value != 0 && *value != '\n' && *value <= ' ')
+                value++;
+            last = value;
+            while (*last > ' ')
+                last++;
+            if (*last)
+                *last = 0;
+            strncpy(bootmode, value, max_len);
+            bootmode[max_len-1] = 0;
+            ret = 0;
+            break;
+        }
+    }
+
+    fclose(file);
+    return ret;
 }
 
+// Behaviour from fremantle binary version:
+// bootreason is read from file /proc/bootreason
 static int get_bootreason(char* bootreason, int max_len)
 {
-    return get_cmd_line_value(bootreason, max_len, "bootreason=");
+    FILE* file;
+    char* last;
+    int   cmd;
+
+    // Try also harmattan behaviour
+    cmd = get_cmd_line_value(bootreason, max_len, "bootreason=");
+    if (cmd == 0)
+        return 0;
+
+    file = fopen(BOOT_REASON_PATH, "r");
+    if (!file) {
+        log_msg("Could not open " BOOT_REASON_PATH " - %s\n", strerror(errno));
+        return -1;
+    }
+
+    if(!fgets(bootreason, max_len, file))
+        bootreason[0] = 0;
+
+    last = bootreason;
+    while (*last > ' ')
+        last++;
+    if (*last)
+        *last = 0;
+
+    fclose(file);
+    return 0;
+}
+
+// Behaviour from fremantle binary version:
+// parms structure from kernel module twl4030-madc.c
+// parms: channel = 4, average = 1
+// ioctl /dev/twl4030-adc 0x6000 &parms
+// return: status = 0, result = BSI
+static int get_bsi(void)
+{
+    int    fd;
+    int    ret;
+    struct twl4030_madc_user_parms par;
+
+    fd = open(TWL4030_MADC_PATH, O_RDONLY);
+    if (fd < 0) {
+       log_msg("Could not open " TWL4030_MADC_PATH " - %s\n", strerror(errno));
+       return -1;
+    }
+
+    par.channel = 1 << 2;
+    par.average = 1;
+    ret = ioctl(fd, TWL4030_MADC_IOCX_ADC_RAW_READ, &par);
+
+    close(fd);
+
+    if (ret != 0 || par.status != 0) {
+       log_msg("Could not get battery type\n");
+       return -1;
+    }
+
+    return par.result;
+}
+
+// Access cal partition on fremantle
+// If enabled R&D mode return 1 otherwise 0
+static int get_rdmode(void)
+{
+    struct cal*   cal;
+    void*         ptr;
+    char*         str;
+    unsigned long len;
+    int           ret;
+
+    if (cal_init(&cal) < 0)
+        return 0;
+
+    ret = cal_read_block(cal, "r&d_mode", &ptr, &len, CAL_FLAG_USER);
+    cal_finish(cal);
+
+    if (ret < 0 || !ptr)
+        return 0;
+
+    str = (char *)ptr;
+
+    if (len < 1 || !str[0])
+        return 0;
+    else
+        return 1;
 }
 
 static void log_msg(char* format, ...)
@@ -361,8 +505,10 @@ static void return_bootstate(const char*        bootstate,
                              LOOP_COUNTING_TYPE count_type)
 {
     // Only save "normal" bootstates (USER, ACT_DEAD)
-    if (forcemode) {
-        static const char* saveable[] = { "USER", "ACT_DEAD", 0 };
+    // Behaviour from fremantle binary:
+    // Save state every time (not only in force mode) and save SHUTDOWN bootstate too
+//    if (forcemode) {
+        static const char* saveable[] = { "USER", "ACT_DEAD", "SHUTDOWN", 0 };
         int i;
 
         for (i = 0; saveable[i]; ++i) {
@@ -371,7 +517,7 @@ static void return_bootstate(const char*        bootstate,
                 break;
             }
         }
-    }
+//    }
 
     // Deal with possible startup loops
     if (forcemode) {
@@ -392,6 +538,8 @@ int main(int argc, char** argv)
 {
     char bootreason[MAX_BOOTREASON_LEN];
     char bootmode[MAX_BOOTREASON_LEN];
+    int  rdmode;
+    int  bsi;
 
     if (argc  > 1  && !strcmp(argv[1], "-f")) {
         forcemode = true;
@@ -427,6 +575,27 @@ int main(int argc, char** argv)
         return_bootstate("MALF",
                          "SOFTWARE bootloader security violation",
                          COUNT_BOOTS);
+    }
+
+
+    bsi = get_bsi();
+    rdmode = get_rdmode();
+
+
+    // Behaviour from fremantle binary version:
+    // BSI 32..85 - Service battery and LOCAL bootstate
+    // BSI 87..176 - Test battery and TEST bootstate
+    // BSI 280..568 - Normal battery and continue checking
+    // Other BSI values and not in R&D mode - Show error and SHUTDOWN bootstate
+    if (bsi >= 32 && bsi <= 85) {
+        log_msg("Service battery detected\n");
+        return_bootstate("LOCAL", 0, COUNT_BOOTS);
+    } else if (bsi >= 87 && bsi <= 176) {
+        log_msg("Test battery detected\n");
+        return_bootstate("TEST", 0, COUNT_BOOTS);
+    } else if (!rdmode && (bsi < 280 || bsi > 568)) {
+        log_msg("Unknown battery detected. raw bsi value %d\n", bsi);
+        return_bootstate("SHUTDOWN", 0, COUNT_BOOTS);
     }
 
 
