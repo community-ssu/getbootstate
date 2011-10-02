@@ -34,7 +34,7 @@
 #include <stdbool.h>
 #include <fcntl.h>
 #include <cal.h>
-#include <asm/ioctl.h>
+#include <sys/ioctl.h>
 
 #define MAX_BOOTREASON_LEN   40
 #define MAX_REBOOT_COUNT_LEN 40
@@ -122,6 +122,7 @@ static int get_cmd_line_value(char* get_value, int max_len, char* key)
                 value = strtok(NULL, "=");
                 if (value) {
                     strncpy(get_value, value, max_len);
+                    get_value[max_len-1] = 0;
                     ret = 0;
                 }
                 break;
@@ -400,7 +401,7 @@ static void read_loop_counts(unsigned* boots, unsigned* wd_resets)
 static unsigned get_env(const char* name, unsigned default_value)
 {
     const char* e = getenv(name);
-    return e ? atoi(e) : default_value;
+    return e ? (unsigned)atoi(e) : default_value;
 }
 
 typedef enum {
@@ -500,7 +501,7 @@ static void return_bootstate(const char*        bootstate,
     exit (0);
 }
 
-int main(int argc, char** argv)
+int main()
 {
     char bootreason[MAX_BOOTREASON_LEN];
     char bootmode[MAX_BOOTREASON_LEN];
