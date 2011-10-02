@@ -32,7 +32,6 @@
 #include <string.h>
 #include <errno.h>
 #include <stdbool.h>
-#include <time.h>
 #include <fcntl.h>
 #include <cal.h>
 #include <asm/ioctl.h>
@@ -42,10 +41,7 @@
 #define MAX_SAVED_STATE_LEN  40
 
 #define DEFAULT_MAX_BOOTS          10
-#define DEFAULT_MIN_BOOT_TIME     120 // seconds ==  2 minutes
-
 #define DEFAULT_MAX_WD_RESETS       6
-#define DEFAULT_MIN_WD_RESET_TIME 600 // seconds == 10 minutes
 
 #define BOOT_LOOP_COUNT_PATH "/var/lib/dsme/boot_count"
 #define SAVED_STATE_PATH     "/var/lib/dsme/saved_state"
@@ -88,8 +84,6 @@ struct twl4030_madc_user_parms {
     unsigned short int result;
 };
 
-
-static bool forcemode = false;
 
 static void log_msg(char* format, ...) __attribute__ ((format (printf, 1, 2)));
 
@@ -360,7 +354,7 @@ static char* get_saved_state(void)
 }
 
 
-static void write_loop_counts(unsigned boots, unsigned wd_resets, time_t when)
+static void write_loop_counts(unsigned boots, unsigned wd_resets)
 {
     FILE* f;
 
@@ -368,7 +362,7 @@ static void write_loop_counts(unsigned boots, unsigned wd_resets, time_t when)
         log_msg("Could not open " BOOT_LOOP_COUNT_PATH ": %s\n",
                 strerror(errno));
     } else {
-        if (fprintf(f, "%lu %u %u", when, boots, wd_resets) < 0) {
+        if (fprintf(f, "%u %u", boots, wd_resets) < 0) {
             log_msg("Error writing " BOOT_LOOP_COUNT_PATH "\n");
         } else if (ferror(f) || fflush(f) == EOF) {
             log_msg("Error flushing " BOOT_LOOP_COUNT_PATH ": %s\n",
@@ -385,11 +379,10 @@ static void write_loop_counts(unsigned boots, unsigned wd_resets, time_t when)
     }
 }
 
-static void read_loop_counts(unsigned* boots, unsigned* wd_resets, time_t* when)
+static void read_loop_counts(unsigned* boots, unsigned* wd_resets)
 {
     *boots     = 0;
     *wd_resets = 0;
-    *when      = 0;
 
     FILE* f;
 
@@ -397,8 +390,8 @@ static void read_loop_counts(unsigned* boots, unsigned* wd_resets, time_t* when)
         log_msg("Could not open " BOOT_LOOP_COUNT_PATH ": %s\n",
                 strerror(errno));
     } else {
-        if (fscanf(f, "%lu %u %u", (unsigned long*)when, boots, wd_resets) != 3) {
-            log_msg("Error reading file " BOOT_LOOP_COUNT_PATH);
+        if (fscanf(f, "%u %u", boots, wd_resets) != 2) {
+            log_msg("Error reading file " BOOT_LOOP_COUNT_PATH "\n");
         }
         (void)fclose(f);
     }
@@ -422,43 +415,26 @@ static void check_for_boot_loops(LOOP_COUNTING_TYPE count_type,
 {
     unsigned      boots;
     unsigned      wd_resets;
-    time_t        now;
-    time_t        last;
-    unsigned long seconds;
     const char*   loop_malf_info = 0;
     unsigned      max_boots;
     unsigned      max_wd_resets;
-    unsigned      min_boot_time;
-    unsigned      min_wd_reset_time;
 
-    time(&now);
-    read_loop_counts(&boots, &wd_resets, &last);
-    seconds = now - last;
+    read_loop_counts(&boots, &wd_resets);
 
     // Obtain limits
     max_boots         = get_env("GETBOOTSTATE_MAX_BOOTS",
                                 DEFAULT_MAX_BOOTS);
     max_wd_resets     = get_env("GETBOOTSTATE_MAX_WD_RESETS",
                                 DEFAULT_MAX_WD_RESETS);
-    min_boot_time     = get_env("GETBOOTSTATE_MIN_BOOT_TIME",
-                                DEFAULT_MIN_BOOT_TIME);
-    min_wd_reset_time = get_env("GETBOOTSTATE_MIN_WD_RESET_TIME",
-                                DEFAULT_MIN_WD_RESET_TIME);
 
     // Check for too many frequent and consecutive reboots
     if (count_type & COUNT_BOOTS) {
-        if (seconds < min_boot_time) {
-            if (++boots > max_boots) {
-                // Detected a boot loop
-                loop_malf_info = "SOFTWARE unknown too frequent reboots";
-                log_msg("%d reboots; loop detected\n", boots);
-            } else {
-                log_msg("Increased boot count to %d\n", boots);
-            }
+        if (++boots > max_boots) {
+            // Detected a boot loop
+            loop_malf_info = "SOFTWARE unknown too frequent reboots";
+            log_msg("%d reboots; loop detected\n", boots);
         } else {
-            log_msg("%d s or more since last reboot; resetting counter\n",
-                    min_boot_time);
-            boots = 0;
+            log_msg("Increased boot count to %d\n", boots);
         }
     } else {
         log_msg("Resetting boot counter\n");
@@ -467,18 +443,12 @@ static void check_for_boot_loops(LOOP_COUNTING_TYPE count_type,
 
     // Check for too many frequent and consecutive WD resets
     if (count_type & COUNT_WD_RESETS) {
-        if (seconds < min_wd_reset_time) {
-            if (++wd_resets > max_wd_resets) {
-                // Detected a WD reset loop
-                loop_malf_info = "SOFTWARE watchdog too frequent resets";
-                log_msg("%d WD resets; loop detected\n", wd_resets);
-            } else {
-                log_msg("Increased WD reset count to %d\n", wd_resets);
-            }
+        if (++wd_resets > max_wd_resets) {
+            // Detected a WD reset loop
+            loop_malf_info = "SOFTWARE watchdog too frequent resets";
+            log_msg("%d WD resets; loop detected\n", wd_resets);
         } else {
-            log_msg("%d s or more since last WD reset; resetting counter\n",
-                    min_wd_reset_time);
-            wd_resets = 0;
+            log_msg("Increased WD reset count to %d\n", wd_resets);
         }
     } else {
         log_msg("Resetting WD reset counter\n");
@@ -497,7 +467,7 @@ static void check_for_boot_loops(LOOP_COUNTING_TYPE count_type,
         }
     }
 
-    write_loop_counts(boots, wd_resets, now);
+    write_loop_counts(boots, wd_resets);
 }
 
 static void return_bootstate(const char*        bootstate,
@@ -506,26 +476,22 @@ static void return_bootstate(const char*        bootstate,
 {
     // Only save "normal" bootstates (USER, ACT_DEAD)
     // Behaviour from fremantle binary:
-    // Save state every time (not only in force mode) and save SHUTDOWN bootstate too
-//    if (forcemode) {
-        static const char* saveable[] = { "USER", "ACT_DEAD", "SHUTDOWN", 0 };
-        int i;
+    // Save SHUTDOWN bootstate too
+    static const char* saveable[] = { "USER", "ACT_DEAD", "SHUTDOWN", 0 };
+    int i;
 
-        for (i = 0; saveable[i]; ++i) {
-            if (!strncmp(bootstate, saveable[i], strlen(saveable[i]))) {
-                save_state(saveable[i]);
-                break;
-            }
+    for (i = 0; saveable[i]; ++i) {
+        if (!strncmp(bootstate, saveable[i], strlen(saveable[i]))) {
+            save_state(saveable[i]);
+            break;
         }
-//    }
-
-    // Deal with possible startup loops
-    if (forcemode) {
-        check_for_boot_loops(count_type, &malf_info);
     }
 
+    // Deal with possible startup loops
+    check_for_boot_loops(count_type, &malf_info);
+
     // Print the bootstate to console and exit
-    if (forcemode && malf_info) {
+    if (malf_info) {
         printf("%s %s\n", bootstate, malf_info);
     } else {
         puts(bootstate);
@@ -540,10 +506,6 @@ int main(int argc, char** argv)
     char bootmode[MAX_BOOTREASON_LEN];
     int  rdmode;
     int  bsi;
-
-    if (argc  > 1  && !strcmp(argv[1], "-f")) {
-        forcemode = true;
-    }
 
     if(!get_bootmode(bootmode, MAX_BOOTREASON_LEN)) {
         if(!strcmp(bootmode, BOOT_MODE_UPDATE_MMC)) {
