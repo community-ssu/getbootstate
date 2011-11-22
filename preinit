@@ -11,6 +11,9 @@
 # consent of Nokia Corporation. This material also contains confidential information which may not be disclosed to others
 # without the prior written consent of Nokia.
 
+# Maemo community has permission to modify and redistribute this script for open source projects
+# See Quim Gil post on https://bugs.maemo.org/show_bug.cgi?id=12228#c9
+
 FS_MODULES="mbcache ext2 jbd ext3"
 MODULE_PATH=/lib/modules/current
 
