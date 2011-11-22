@@ -14,6 +14,9 @@
 # Maemo community has permission to modify and redistribute this script for open source projects
 # See Quim Gil post on https://bugs.maemo.org/show_bug.cgi?id=12228#c9
 
+# Modified by:
+# Copyright (C) 2011 Pali Rohár <pali.rohar@gmail.com>
+
 FS_MODULES="mbcache ext2 jbd ext3"
 MODULE_PATH=/lib/modules/current
 
@@ -24,17 +27,17 @@ echo_g()
 
 init_system()
 {
-        mount -t proc none /proc
-        mount -t sysfs none /sys
-        mount -t tmpfs none -o size=512K /tmp
+	mount -t proc none /proc
+	mount -t sysfs none /sys
+	mount -t tmpfs none -o size=512K /tmp
 
-        mkdir /tmp/dev
+	mkdir /tmp/dev
 
 	# The twl4030 can either be named twl4030-adc or twl4030-madc.
 	# So we check for both.
 
 	madc_minor=$(grep twl4030-adc /proc/misc | cut -d " " -f 2)
-	
+
 	if [ -z $madc_minor ] ; then
 		madc_minor=$(grep twl4030-madc /proc/misc | cut -d " " -f 2)
 	fi
@@ -61,35 +64,35 @@ fini_system()
 }
 
 set_default_root_params() {
-        root_dev=mtdblock4
-        root_dev_name="Flash"
-        root_fstype="jffs2"
-        root_fsoptions="rpsize=1024,rpuid=0,rpuid=30000"
-        root_mounted=1
+	root_dev=mtdblock4
+	root_dev_name="Flash"
+	root_fstype="jffs2"
+	root_fsoptions="rpsize=1024,rpuid=0,rpuid=30000"
+	root_mounted=1
 }
 
 check_partitions()
 {
-        grep mtdblock4 /proc/partitions >/dev/null
-        if [ $? = 0 ] ; then
-                mtd_found=1
-        else
-                mtd_found=0
-        fi
+	grep mtdblock4 /proc/partitions >/dev/null
+	if [ $? = 0 ] ; then
+		mtd_found=1
+	else
+		mtd_found=0
+	fi
 
-        grep sda1 /proc/partitions >/dev/null
-        if [ $? = 0 ] ; then
-                sda_found=1
-        else
-                sda_found=0
-        fi
+	grep sda1 /proc/partitions >/dev/null
+	if [ $? = 0 ] ; then
+		sda_found=1
+	else
+		sda_found=0
+	fi
 
-        grep mmc /proc/partitions >/dev/null
-        if [ $? = 0 ] ; then
-                mmc_found=1
-        else
-                mmc_found=0
-        fi
+	grep mmc /proc/partitions >/dev/null
+	if [ $? = 0 ] ; then
+		mmc_found=1
+	else
+		mmc_found=0
+	fi
 }
 
 search_root_onmmc() {
@@ -97,36 +100,36 @@ search_root_onmmc() {
 # which contains /sbin/init, it will be used as root
 # also fallback to the mtdblock4 (our flash)
 
-        parts=`awk '{print $4}' /proc/partitions | grep 'mmcblk[0-9][0-9]*p[0-9]'`
-        [ -z "$parts" ] && return 1
+	parts=`awk '{print $4}' /proc/partitions | grep 'mmcblk[0-9][0-9]*p[0-9]'`
+	[ -z "$parts" ] && return 1
 
-        for i in $parts; do
-                if mount_device "$i"; then
-                        if [ -x /mnt/new_root/sbin/init ]; then
-                                root_dev="$i"
-                                return 0;
-                        fi
-                        umount_device "$i"
-                fi
-        done
-        return 1
+	for i in $parts; do
+		if mount_device "$i"; then
+			if [ -x /mnt/new_root/sbin/init ]; then
+				root_dev="$i"
+				return 0;
+			fi
+			umount_device "$i"
+		fi
+	done
+	return 1
 
 }
 
 show_roots()
 {
-        echo "Choose bootup option:"
-        if [ $mtd_found -eq 1 ]; then
-                echo "  1) Flash"
-        fi
-        if [ $mmc_found -eq 1 ]; then
-                echo "  2) MMC"
-        fi
-        if [ $sda_found -eq 1 ]; then
-                echo "  3) USB Mass Storage Device"
-        fi
-        echo "  9) Start a shell"
-        echo ""
+	echo "Choose bootup option:"
+	if [ $mtd_found -eq 1 ]; then
+		echo "  1) Flash"
+	fi
+	if [ $mmc_found -eq 1 ]; then
+		echo "  2) MMC"
+	fi
+	if [ $sda_found -eq 1 ]; then
+		echo "  3) USB Mass Storage Device"
+	fi
+	echo "  9) Start a shell"
+	echo ""
 }
 
 start_pty_system() {
@@ -136,7 +139,7 @@ start_pty_system() {
 	mknod /dev/ptmx c 5 2
 	chmod 666 /dev/ptmx
 
-	if [ ! -d /dev/pts ] ; then 
+	if [ ! -d /dev/pts ] ; then
 		mkdir /dev/pts
 	fi
 	mount -t devpts devpts -o gid=5,mode=620 /dev/pts
@@ -150,7 +153,7 @@ start_shell()
 	# connections
 	start_pty_system
 
-        echo "Starting shell"
+	echo "Starting shell"
 
 	# We use getty instead of just running /bin/sh because we want to have
 	# job control working (e.g., we want Ctrl-C). With /bin/sh this does
@@ -161,42 +164,42 @@ start_shell()
 
 show_rd_versions()
 {
-        bg_color=0xffff
-        y=0
-        x=0
-        line_height=20
+	bg_color=0xffff
+	y=0
+	x=0
+	line_height=20
 
-        text2screen -c -x 0 -y 0 -w 800 -h 160
-        text2screen -t "Kernel version:" -s 2 -x $x -y $y -B $bg_color
-        y=$(expr $y + $line_height)
-        text2screen -t "  `uname -r` " -s 2 -x $x -y $y -B $bg_color
-        y=$(expr $y + $line_height)
-        text2screen -t "  `uname -v`" -s 2 -x $x -y $y -B $bg_color
+	text2screen -c -x 0 -y 0 -w 800 -h 160
+	text2screen -t "Kernel version:" -s 2 -x $x -y $y -B $bg_color
+	y=$(expr $y + $line_height)
+	text2screen -t "  `uname -r` " -s 2 -x $x -y $y -B $bg_color
+	y=$(expr $y + $line_height)
+	text2screen -t "  `uname -v`" -s 2 -x $x -y $y -B $bg_color
 
-        y=$(expr $y + $line_height + $line_height)
-        text2screen -t " no initfs \o/" -s 2 -x $x -y $y -B $bg_color
+	y=$(expr $y + $line_height + $line_height)
+	text2screen -t " no initfs \o/" -s 2 -x $x -y $y -B $bg_color
 
-        y=340
-        text2screen -c -y 320 -x 0 -w 320 -h 120
-        text2screen -t "Component versions:" -x $x -y $y -s 2 -B $bg_color
-        y=$(expr $y + $line_height)
-        while read line ; do
-                text2screen -t "  $line" -x $x -y $y -s 2 -B $bg_color
-                y=$(expr $y + $line_height)
-        done < /proc/component_version
+	y=340
+	text2screen -c -y 320 -x 0 -w 320 -h 120
+	text2screen -t "Component versions:" -x $x -y $y -s 2 -B $bg_color
+	y=$(expr $y + $line_height)
+	while read line ; do
+		text2screen -t "  $line" -x $x -y $y -s 2 -B $bg_color
+		y=$(expr $y + $line_height)
+	done < /proc/component_version
 }
 
 load_mmc_modules()
 {
-        for mod in $FS_MODULES ; do
-                if [ -f $MODULE_PATH/$mod.ko ]; then
-                        insmod $MODULE_PATH/$mod.ko
-                fi
-        done
+	for mod in $FS_MODULES ; do
+		if [ -f $MODULE_PATH/$mod.ko ]; then
+			insmod $MODULE_PATH/$mod.ko
+		fi
+	done
 }
 
 prepare_core() {
-	if [ -f /etc/osso_software_version ] ; then 
+	if [ -f /etc/osso_software_version ] ; then
 		release=`cat /etc/osso_software_version`
 		echo "/media/mmc1/core-dumps/%e-%s-%p-$release.core" >/proc/sys/kernel/core_pattern
 	fi
@@ -205,38 +208,38 @@ prepare_core() {
 
 mount_device() {
 	echo_g "Mounting $1"
-        root_dev="$1"
+	root_dev="$1"
 
-        [ -z "$root_dev" ] && return 1
+	[ -z "$root_dev" ] && return 1
 	if [ ! -e /mnt/new_root ]; then
-		mkdir -p /mnt/new_root	
+		mkdir -p /mnt/new_root
 	fi
 
-        if [ -z $root_fstype ]; then
-                if [ -z $root_fsoptions ]; then
-                        time mount /dev/$root_dev /mnt/new_root
-                else
-                        time mount -o $root_fsoptions /dev/$root_dev /mnt/new_root
-                fi
-        else
-                if [ -z $root_fsoptions ]; then
-                        time mount -t $root_fstype /dev/$root_dev /mnt/new_root
-                else
-                        time mount -t $root_fstype -o $root_fsoptions /dev/$root_dev /mnt/new_root
-                fi
-        fi
-        grep -q new_root /proc/mounts
+	if [ -z $root_fstype ]; then
+		if [ -z $root_fsoptions ]; then
+			time mount /dev/$root_dev /mnt/new_root
+		else
+			time mount -o $root_fsoptions /dev/$root_dev /mnt/new_root
+		fi
+	else
+		if [ -z $root_fsoptions ]; then
+			time mount -t $root_fstype /dev/$root_dev /mnt/new_root
+		else
+			time mount -t $root_fstype -o $root_fsoptions /dev/$root_dev /mnt/new_root
+		fi
+	fi
+	grep -q new_root /proc/mounts
 }
 
 umount_device() {
-         grep -q "$1"  /proc/mounts  && umount /dev/$1
+	 grep -q "$1"  /proc/mounts  && umount /dev/$1
 }
 
 mount_new_root()
 {
-        if ! grep -q new_root /proc/mounts; then
-                mount_device "$root_dev"
-        fi
+	if ! grep -q new_root /proc/mounts; then
+		mount_device "$root_dev"
+	fi
 }
 
 enter_state()
@@ -244,7 +247,7 @@ enter_state()
 	echo active > /sys/devices/platform/gpio-switch/cmt_bsi/state
 	STATE=`getbootstate`
 	echo_g "Entering state '$STATE'."
-	case $STATE in 
+	case $STATE in
 		BOOT)
 			def_runlevel=6
 			;;
@@ -261,10 +264,10 @@ enter_state()
 			def_runlevel=0
 			;;
 		*)
-	                if [ $rd_mode -ne 0 ]; then
-       				start_shell
+			if [ $rd_mode -ne 0 ]; then
+				start_shell
 				return
-               		fi
+			fi
 			echo_g "Houston, we have a problem, powering off..."
 			text2screen -c -x 0 -y 0 -h 80 -w 800
 			text2screen -t "Malfunction !" -x 0 -y 0 -s 4
@@ -278,26 +281,26 @@ enter_state()
 
 boot()
 {
-        if [ $root_mounted -ne 1 ]; then
-                mount_new_root
-                if [ $? -ne 0 ]; then
-                        return 1
-                fi
-                cd /mnt/new_root
-                if [ ! -d mnt/initfs ]; then
-                        mkdir -p mnt/initfs
-                fi
+	if [ $root_mounted -ne 1 ]; then
+		mount_new_root
+		if [ $? -ne 0 ]; then
+			return 1
+		fi
+		cd /mnt/new_root
+		if [ ! -d mnt/initfs ]; then
+			mkdir -p mnt/initfs
+		fi
 		fini_system
 		pivot_root . mnt/initfs
 		CHROOT="/usr/sbin/chroot ."
 	else
-                if [ ! -x /sbin/init ]; then
-                        echo_g "/sbin/init not found on root device"
-                        return 1
-                fi
+		if [ ! -x /sbin/init ]; then
+			echo_g "/sbin/init not found on root device"
+			return 1
+		fi
 		fini_system
 	fi
-	
+
 	# let me see then, what thereat is and this mistery explore
 	/sbin/fiasco-do-update
 
@@ -324,9 +327,9 @@ chown pulse:pulse /sys/power/vdd2_lock
 serial_console=0
 rd_mode=$(cal-tool --get-rd-mode 2> /dev/null)
 if [ "$rd_mode" = "enabled" ]; then
-        rd_mode=1
-        echo_g "R&D mode enabled"
-        show_rd_versions
+	rd_mode=1
+	echo_g "R&D mode enabled"
+	show_rd_versions
 	if [ $(cal-tool -f | sed 's/,/\n/g' | grep serial-console) = "serial-console" ] ; then
 		serial_console=1;
 	fi
@@ -334,7 +337,7 @@ if [ "$rd_mode" = "enabled" ]; then
 	echo active > /sys/devices/platform/gpio-switch/sleep_ind/state
 	awk '/sleep_ind/{ if ($2 == 1) { VALUE="active"; } else { VALUE="inactive"; } print VALUE > "/sys/devices/platform/gpio-switch/sleep_ind/state"  }' < /etc/pmconfig
 else
-        rd_mode=0
+	rd_mode=0
 fi
 
 prepare_core
@@ -344,83 +347,83 @@ enter_state
 want_menu=0
 root_mounted=0
 if [ $serial_console -ne 0 ]; then
-        echo_g "Press any key for interactive startup"
-        key_pressed 1
-        if [ $? -ne 0 ]; then
-                want_menu=1
-        fi
+	echo_g "Press any key for interactive startup"
+	key_pressed 1
+	if [ $? -ne 0 ]; then
+		want_menu=1
+	fi
 fi
 
 if [ $want_menu -ne 1 ]; then
-        default_root=$(cal-tool --get-root-device 2> /dev/null)
-        set_default_root_params
-        SLIDE_STATE=`cat /sys/devices/platform/gpio-switch/slide/state`
-        if [ x"$SLIDE_STATE" = "xopen" ] ; then
+	default_root=$(cal-tool --get-root-device 2> /dev/null)
+	set_default_root_params
+	SLIDE_STATE=`cat /sys/devices/platform/gpio-switch/slide/state`
+	if [ x"$SLIDE_STATE" = "xopen" ] ; then
 		echo_g "slide open, attempting to use bootmenu"
 		[ -f /bootmenu.sh ] && . /bootmenu.sh
-        fi
-                                 
-        case "$default_root" in
-        mmc) 
-                load_mmc_modules
-                if search_root_onmmc; then
-                        root_dev_name="MMC"
-                        root_dev_set=1
-                        root_fstype=""
-                        root_fsoptions=""
-                else
-                        echo_g "No mmc root found, try default"
-                        set_default_root_params
-                fi
-                ;;
-        usb)
-                root_dev=sda1
-                root_dev_name="USB hard drive"
-                root_dev_set=1
-                root_fstype=""
-                root_fsoptions=""
-                ;;
-        esac
-        boot
+	fi
+
+	case "$default_root" in
+	mmc)
+		load_mmc_modules
+		if search_root_onmmc; then
+			root_dev_name="MMC"
+			root_dev_set=1
+			root_fstype=""
+			root_fsoptions=""
+		else
+			echo_g "No mmc root found, try default"
+			set_default_root_params
+		fi
+		;;
+	usb)
+		root_dev=sda1
+		root_dev_name="USB hard drive"
+		root_dev_set=1
+		root_fstype=""
+		root_fsoptions=""
+		;;
+	esac
+	boot
 fi
 
 root="invalid"
 while [ true ]; do
-        check_partitions
-        show_roots
-        root_dev_set=0
-        read root
-        case "$root" in
-            1)
-                set_default_root_params
-	    	root_dev_set=1
-                ;;
-            2)
-                if search_root_onmmc; then
-                        root_dev_name="MMC"
-                        root_dev_set=1
-                        root_fstype=""
-                        root_fsoptions=""
-                else
-                        echo_g "Could not find suitable partition for root on mmc"
-                fi
-                ;;
-            3)
-                root_dev=sda1
-                root_dev_name="USB hard drive"
-                root_dev_set=1
-                root_fstype=""
-                root_fsoptions=""
-                ;;
-            9)
-                start_shell
-                ;;
-            *)
-                echo_g "Invalid selection"
-                ;;
-        esac
-        if [ $root_dev_set -eq 1 ]; then
-                boot
-        fi
+	check_partitions
+	show_roots
+	root_dev_set=0
+	read root
+	case "$root" in
+		1)
+			set_default_root_params
+			root_dev_set=1
+			;;
+		2)
+			if search_root_onmmc; then
+				root_dev_name="MMC"
+				root_dev_set=1
+				root_fstype=""
+				root_fsoptions=""
+			else
+				echo_g "Could not find suitable partition for root on mmc"
+			fi
+			;;
+		3)
+			root_dev=sda1
+			root_dev_name="USB hard drive"
+			root_dev_set=1
+			root_fstype=""
+			root_fsoptions=""
+			;;
+		9)
+			start_shell
+			;;
+		*)
+			echo_g "Invalid selection"
+			;;
+	esac
+	if [ $root_dev_set -eq 1 ]; then
+		boot
+	fi
 done
 
