@@ -1,0 +1,5 @@
+#!/bin/sh
+
+echo USER > /var/lib/dsme/saved_state
+
+

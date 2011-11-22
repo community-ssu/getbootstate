@@ -1,0 +1,14 @@
+Source: getbootstate
+Section: utils
+Priority: required
+Maintainer: Pali Rohár <pali.rohar@gmail.com>
+Build-Depends: libcal-dev
+
+Package: getbootstate
+Architecture: armel
+Depends: ${shlibs:Depends}, initrd-progs
+Description: Determines runlevel on maemo system
+ The getbootstate command determines the runlevel a maemo system boots into.
+ .
+ The runlevel is determined based on the BSI, the battery voltage level and the
+ bootreason.

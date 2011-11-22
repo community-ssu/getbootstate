@@ -1,0 +1,271 @@
+getbootstate (2.0) fremantle; urgency=low
+
+  * New open source version of getbootstate.c (based on harmattan getbootstate.c from dsme tree)
+  * New open source version of bsi-read.c
+  * A lot of fixes in preinit
+
+ -- Pali Rohár <pali.rohar@gmail.com>  Tue, 22 Nov 2011 14:51:02 +0100
+
+getbootstate (1.0.39+0m5) unstable; urgency=low
+
+  * This entry has been added by BIFH queue processor
+    Suffix +0m5 added to package revision
+
+ -- mika yrjola <ext-mika.2.yrjola@nokia.com>  Fri, 15 Jan 2010 17:04:03 +0200
+
+getbootstate (1.0.39) unstable; urgency=low
+
+  * Same fix for PR1.2. Fix device getting stuck when max reboots exceeded. Fixes: NB#152742
+
+ -- Philippe De Swert <philippe.de-swert@nokia.com>  Thu, 14 Jan 2010 14:37:46 +0200
+
+getbootstate (1.0.38) unstable; urgency=low
+
+  * Fix device getting stuck when max reboots exceeded. Fixes: 150984
+
+ -- Peter 'p2' De Schrijver <peter-de.schrijver@nokia.com>  Wed, 16 Dec 2009 15:05:10 +0200
+
+getbootstate (1.0.37~ash1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Call softupd for deferred updates.
+
+ -- Alexander Shishkin <ext-alexander.shishkin@nokia.com>  Mon, 09 Nov 2009 19:01:36 +0200
+
+getbootstate (1.0.36) unstable; urgency=low
+
+  * Add support for bootmenu.sh. Thanks to Carsten V. Munk.
+
+ -- Peter 'p2' De Schrijver <peter-de.schrijver@nokia.com>  Mon, 05 Oct 2009 17:55:52 +0300
+
+getbootstate (1.0.35) unstable; urgency=low
+
+  * Disable Smartreflex for now. Fixes: NB#136233
+
+ -- Jouni Hogander <jouni.hogander@nokia.com>  Wed,  30 Sep 2009 09:10:51 +0300
+
+getbootstate (1.0.34) unstable; urgency=low
+
+  * Configure sleep_ind using /etc/pmconfig in R&D mode.
+
+ -- Peter 'p2' De Schrijver <peter-de.schrijver@nokia.com>  Wed,  9 Sep 2009 17:56:51 +0300
+
+getbootstate (1.0.33) unstable; urgency=low
+
+  * Enable DPS by default.
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Mon, 15 Jun 2009 14:03:35 +0300
+
+getbootstate (1.0.32) unstable; urgency=low
+
+  * Label console prints with "getbootstate: ". Fixes: NB#102795
+  * Remove bsi_read call from preinit
+
+ -- Juha Keski-Saari <ext-juha.1.keski-saari@nokia.com>  Thu, 11 Jun 2009 10:23:00 +0300
+
+getbootstate (1.0.31) unstable; urgency=low
+
+  * Enable Smartreflex by default. Fixes: NB#120620
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Fri, 05 Jun 2009 13:55:39 +0300
+
+getbootstate (1.0.30) unstable; urgency=low
+
+  * Enable DVFS by default. Fixes: NB#111666
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Thu,  4 Jun 2009 13:59:20 +0300
+
+getbootstate (1.0.29) unstable; urgency=low
+
+  * Implement configuration file and read from it
+
+ -- Juha Keski-Saari <ext-juha.1.keski-saari@nokia.com>  Wed, 6 May 2009 10:51:00 +0300
+
+getbootstate (1.0.28) unstable; urgency=low
+
+  * Enable smartreflex at bootup.
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Tue, 31 Mar 2009 15:05:37 +0300
+
+getbootstate (1.0.27) unstable; urgency=low
+
+  * Alignment of TEST_MIN and TEST_MAX with NOLO values
+
+ -- Jouni Hogander <jouni.hogander@nokia.com>  Thu, 26 Mar 2009 9:47:00 +0200
+
+getbootstate (1.0.26) unstable; urgency=low
+
+  * Change ownership of /sys/power/vdd2_lock
+
+ -- Jouni Hogander <jouni.hogander@nokia.com>  Thu, 26 Mar 2009 9:00:00 +0200
+
+getbootstate (1.0.25) unstable; urgency=low
+
+  * Set UART timeout to 10s
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Wed, 18 Mar 2009 11:50:28 +0200
+
+getbootstate (1.0.24) unstable; urgency=low
+
+  * RTC alarm triggers acting dead state.
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Thu,  8 Jan 2009 16:15:20 +0200
+
+getbootstate (1.0.23) unstable; urgency=low
+
+  * Only enable sleep indication LEDs when in R&D mode
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Tue, 16 Dec 2008 12:07:59 +0200
+
+getbootstate (1.0.22) unstable; urgency=low
+
+  * Fix BSI reading
+  * Only ask for interactive boot if serial-console flag is set
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Fri, 28 Nov 2008 19:33:18 +0200
+
+getbootstate (1.0.21) unstable; urgency=low
+
+  * Support MMC update mode.
+  * Fix booting from early menu.
+  * Enable tty handling.
+  * Enable pty subsystem.
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Thu, 13 Nov 2008 14:00:32 +0200
+
+getbootstate (1.0.20) unstable; urgency=low
+
+  * Add /var/lib/dsme to package.
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Tue, 21 Oct 2008 11:00:32 +0300
+
+getbootstate (1.0.19) unstable; urgency=low
+
+  * Initialize /proc/sys/kernel/core_pattern to catch early core dumps. Fixes: NB#89260
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Thu, 16 Oct 2008 17:12:03 +0300
+
+getbootstate (1.0.18) unstable; urgency=low
+
+  * Remove battery level check. Fixes: NB#86981
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Tue,  9 Sep 2008 18:02:15 +0300
+
+getbootstate (1.0.17) unstable; urgency=low
+
+  * Fix BSI values. Fixes: NB#87642
+  * Change unmount order. Fixes: NB#87919
+  * Fix typos. Fixes: NB#87982, NB#87418
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Tue,  2 Sep 2008 16:26:40 +0300
+
+getbootstate (1.0.16) unstable; urgency=low
+
+  * Do fflush after writing
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Thu, 10 Jul 2008 17:17:28 +0300
+
+getbootstate (1.0.15) unstable; urgency=low
+
+  * Enable sleep and clock off while idle
+  * Change BSI values again
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Wed,  9 Jul 2008 14:59:35 +0300
+
+getbootstate (1.0.14) unstable; urgency=low
+
+  * Use fsync after writing.
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Tue, 24 Jun 2008 13:49:18 +0300
+
+getbootstate (1.0.13) unstable; urgency=low
+
+  * Fix bug in BSI reading.
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Tue, 27 May 2008 17:59:51 +0300
+
+getbootstate (1.0.12) unstable; urgency=low
+
+  * Add logging.
+  * Bootreason 'usb' triggers acting dead state.
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Mon, 26 May 2008 16:46:21 +0300
+
+getbootstate (1.0.11) unstable; urgency=low
+
+  * Update for larger BSI resistor introduced with B1.
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Mon, 19 May 2008 16:57:07 +0300
+
+getbootstate (1.0.10) unstable; urgency=low
+
+  * Accept larger BSI range for normal battery
+  * Print BSI and voltage readings at boottime
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Wed, 14 May 2008 17:04:31 +0300
+
+getbootstate (1.0.9) unstable; urgency=low
+
+  * Force BSI to APE side. Change maximum reset count to 50.
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Thu, 24 Apr 2008 19:18:08 +0300
+
+getbootstate (1.0.8) unstable; urgency=low
+
+  * Remove debugging from preinit script
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Fri, 18 Apr 2008 14:02:42 +0300
+
+getbootstate (1.0.7) unstable; urgency=low
+
+  * Add postinst script to create initial saved_state file
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Fri,  4 Apr 2008 17:01:19 +0300
+
+getbootstate (1.0.6) unstable; urgency=low
+
+  * Enable sleep_ind LED at startup
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Fri,  4 Apr 2008 16:41:20 +0300
+
+getbootstate (1.0.5) unstable; urgency=low
+
+  * fix changelog
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Thu,  3 Apr 2008 19:11:25 +0300
+
+getbootstate (1.0.4) unstable; urgency=low
+
+  * Use direct access to /dev/madc for reading BSI and battery voltage
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Thu,  3 Apr 2008 18:28:28 +0300
+
+getbootstate (1.0.3) unstable; urgency=low
+
+  * Packaging fixes.
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Wed, 19 Mar 2008 17:50:40 +0200
+
+getbootstate (1.0.2) unstable; urgency=low
+
+  * Fixes.
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Wed, 19 Mar 2008 16:55:27 +0200
+
+getbootstate (1.0.1) unstable; urgency=low
+
+  * Remove OMAP2 support.
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Wed, 12 Mar 2008 18:41:14 +0200
+
+getbootstate (1.0.0) unstable; urgency=low
+
+  * Cleanup.
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Wed, 12 Mar 2008 18:41:13 +0200
+
+getbootstate (0.0.0) unstable; urgency=low
+
+  * Initial release. 
+
+ -- Peter De Schrijver <peter-de.schrijver@nokia.com>  Mon, 26 Nov 2007 13:12:19 +0200

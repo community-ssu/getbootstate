@@ -1,0 +1,5 @@
+pmconfig	etc/
+preinit		sbin/
+bsi-read	sbin/
+read_cfg.awk	sbin/
+getbootstate	sbin/

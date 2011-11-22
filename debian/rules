@@ -1,0 +1,10 @@
+#!/usr/bin/make -f
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+
+clean::
+	$(RM) getbootstate bsi-read
+
+build:
+	$(CC) $(CFLAGS) $(LDFLAGS) -lcal getbootstate.c -o getbootstate
+	$(CC) $(CFLAGS) $(LDFLAGS) bsi-read.c -o bsi-read
