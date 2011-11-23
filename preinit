@@ -110,6 +110,12 @@ load_modules()
 	done
 }
 
+load_early_modules()
+{
+	# load all modules specified in /etc/early_modules (ignore white space and all after char '#')
+	[ -f /etc/early_modules ] && load_modules "`sed 's/\s*#.*//;s/^\s*//;/^$/d' /etc/early_modules`"
+}
+
 load_mmc_modules()
 {
 	load_modules "mmc_core mmc_block omap_hsmmc"
@@ -531,6 +537,8 @@ read_pmconfig()
 	awk -f /sbin/read_cfg.awk /etc/pmconfig
 }
 
+
+load_early_modules
 
 init_system
 
