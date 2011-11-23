@@ -224,11 +224,14 @@ static int get_bsi(void)
 
     fd = open(TWL4030_MADC_PATH, O_RDONLY);
     if (fd < 0) {
-       log_msg("Could not open " TWL4030_MADC_PATH " - %s\n", strerror(errno));
-       return -1;
+       fd = open("/tmp" TWL4030_MADC_PATH, O_RDONLY);
+       if (fd < 0) {
+          log_msg("Could not open " TWL4030_MADC_PATH " - %s\n", strerror(errno));
+          return -1;
+       }
     }
 
-    par.channel = 1 << 2;
+    par.channel = 4;
     par.average = 1;
     ret = ioctl(fd, TWL4030_MADC_IOCX_ADC_RAW_READ, &par);
 
