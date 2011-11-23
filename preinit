@@ -10,9 +10,22 @@
 # Copying, including reproducing, storing, adapting or translating, any or all of this material requires the prior written
 # consent of Nokia Corporation. This material also contains confidential information which may not be disclosed to others
 # without the prior written consent of Nokia.
-
+#
 # Maemo community has permission to modify and redistribute this script for open source projects
-# See Quim Gil post on https://bugs.maemo.org/show_bug.cgi?id=12228#c9
+#
+# Original Quim Gil post on https://bugs.maemo.org/show_bug.cgi?id=12228#c9
+#
+# --- Comment #7 from Quim Gil <quimgil@gmail.com> 2011-11-21 21:19:09 EET ---
+# Hi, I'm resolving this since no new activity is expected in relation to this
+# bug. Sorry for not having an official solution - please us the unofficial path
+# for OSS community experimentation in Nokia products. Thanks!
+#
+# --- Comment #8 from Pali Rohár <pali.rohar@gmail.com> 2011-11-21 21:28:57 EET ---
+# Do you mean with this that community could redistribute patched /sbin/preinit
+# script?
+#
+# --- Comment #9 from Quim Gil <quimgil@gmail.com> 2011-11-21 21:35:57 EET ---
+# Yes, as long as this is kept within your OSS community project.
 
 # Modified by:
 # Copyright (C) 2011 Pali Rohár <pali.rohar@gmail.com>
