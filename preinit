@@ -133,9 +133,9 @@ load_mmc_modules()
 {
 	load_modules "mmc_core mmc_block omap_hsmmc"
 	sleep 2
+	rm -f /dev/mmcblk*
 	for p in /sys/block/mmcblk*/ /sys/block/mmcblk*/mmcblk*p*/; do
 		n=`basename $p`
-		rm -f /dev/$n
 		mknod /dev/$n b `cat $p/dev | sed "s/:/ /g"`
 	done
 }
@@ -165,6 +165,7 @@ set_nand_root_params()
 	root_os_name="`osso-info OSSO_PRODUCT_RELEASE_NAME`"
 	root_init="sbin/init"
 	root_mounted=1
+	def_runlevel=""
 }
 
 mount_device()
