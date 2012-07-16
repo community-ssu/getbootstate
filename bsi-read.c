@@ -60,7 +60,7 @@ int main(void) {
 	printf("raw BSI ADC reading: %d\n", par.result);
 
 	/* TODO: How to calculate BSI ?? */
-	printf("BSI: %d\n", -1);
+	printf("BSI: %d\n", -1); /* in mAh */
 
 	par.channel = 12;
 	par.average = 1;
@@ -72,9 +72,10 @@ int main(void) {
 
 	/* FIXME: Is this correct ? */
 	/* In disassembled armel binary is this calculation: */
-	/* ((-2145384445)*level*6000) >> 32 + level*6000 - ((level*6000) >> 31) */
-	/* and it could be same as: */
-	printf("battery level: %d\n", par.result * 3003 / 512);
+	/* (((((-2145384445) * level * 6000) >> 32) + (level * 6000) - ((level * 6000) >> 31)) >> 9) */
+	/* (((((2099203 - (1LL<<31)) * level * 6000) >> 32) - ((level * 6000 << 1) >> 32) + (level * 6000)) >> 9) */
+	/* and it could be similar as: */
+	printf("battery level: %d\n", par.result * 3003 / 512); /* in mV */
 
 	return 0;
 
