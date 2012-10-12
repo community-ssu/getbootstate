@@ -42,7 +42,7 @@ int main(void) {
 
 		fd = open("/tmp" TWL4030_MADC_PATH, O_RDONLY);
 
-		if ( fd < 0 ) {
+		if ( fd < 0 ) {
 
 			perror("Could not open " TWL4030_MADC_PATH);
 			return 1;
@@ -58,9 +58,7 @@ int main(void) {
 		par.result = -1;
 
 	printf("raw BSI ADC reading: %d\n", par.result);
-
-	/* TODO: How to calculate BSI ?? */
-	printf("BSI: %d\n", -1); /* in mAh */
+	printf("BSI: %d\n", 1280 * (1200 * par.result) / (1024 - par.result) / 1000); /* in mAh */
 
 	par.channel = 12;
 	par.average = 1;
@@ -69,13 +67,7 @@ int main(void) {
 		par.result = -1;
 
 	printf("raw battery level: %d\n", par.result);
-
-	/* FIXME: Is this correct ? */
-	/* In disassembled armel binary is this calculation: */
-	/* (((((-2145384445) * level * 6000) >> 32) + (level * 6000) - ((level * 6000) >> 31)) >> 9) */
-	/* (((((2099203 - (1LL<<31)) * level * 6000) >> 32) - ((level * 6000 << 1) >> 32) + (level * 6000)) >> 9) */
-	/* and it could be similar as: */
-	printf("battery level: %d\n", par.result * 3003 / 512); /* in mV */
+	printf("battery level: %d\n", 10000 * par.result / 1705); /* in mV */
 
 	return 0;
 
