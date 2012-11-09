@@ -49,6 +49,44 @@ init_system()
 	mount -t sysfs none /sys
 	mount -t tmpfs none -o size=512K /tmp
 
+	# create needed devices to boot
+	if [ ! -c /dev/null ]; then
+		rm -f /dev/null
+		mknod /dev/null c 1 3
+		chown root:root /dev/null
+		chmod 666 /dev/null
+	fi
+	if [ ! -c /dev/urandom ]; then
+		rm -f /dev/urandom
+		mknod /dev/urandom c 1 9
+		chown root:root /dev/urandom
+		chmod 444 /dev/urandom
+	fi
+	if [ ! -c /dev/console ]; then
+		rm -f /dev/console
+		mknod /dev/console c 5 1
+		chown root:tty /dev/console
+		chmod 600 /dev/console
+	fi
+	if [ ! -c /dev/fb0 ]; then
+		rm -f /dev/fb0
+		mknod /dev/fb0 c 29 0
+		chown root:video /dev/fb0
+		chmod 660 /dev/fb0
+	fi
+	if [ ! -c /dev/mtd1 ]; then
+		rm -f /dev/mtd1
+		mknod /dev/mtd1 c 90 2
+		chown root:root /dev/mtd1
+		chmod 600 /dev/mtd1
+	fi
+	if [ ! -c /dev/tty1 ]; then
+		rm -f /dev/tyy1
+		mknod /dev/tty1 c 4 1
+		chown root:tty /dev/tty1
+		chmod 600 /dev/tty1
+	fi
+
 	mkdir /tmp/dev
 
 	# The twl4030 can either be named twl4030-adc or twl4030-madc.
