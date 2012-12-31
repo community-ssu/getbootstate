@@ -528,10 +528,8 @@ int main()
 
 
     if(get_bootreason(bootreason, MAX_BOOTREASON_LEN) < 0) {
-        log_msg("Bootreason could not be read\n");
-        return_bootstate("MALF",
-                         "SOFTWARE bootloader no bootreason",
-                         COUNT_BOOTS);
+        log_msg("Bootreason could not be read, assuming power button\n");
+        strcpy(bootreason, BOOT_REASON_POWER_KEY);
     }
 
 
