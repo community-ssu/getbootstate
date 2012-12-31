@@ -104,9 +104,6 @@ init_system()
 
 	# set UART timeout to 10s
 	echo 10 > /sys/devices/platform/serial8250.0/sleep_timeout
-
-	# Change ownership to allow locking for pulseaudio
-	chown pulse:pulse /sys/power/vdd2_lock
 }
 
 fini_system()
