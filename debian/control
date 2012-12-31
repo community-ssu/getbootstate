@@ -2,7 +2,7 @@ Source: getbootstate
 Section: utils
 Priority: required
 Maintainer: Pali Rohár <pali.rohar@gmail.com>
-Build-Depends: libcal-dev
+Build-Depends: debhelper (>= 5), cdbs, libcal-dev
 
 Package: getbootstate
 Architecture: armel
