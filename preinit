@@ -81,7 +81,7 @@ init_system()
 		chmod 600 /dev/mtd1
 	fi
 	if [ ! -c /dev/tty1 ]; then
-		rm -f /dev/tyy1
+		rm -f /dev/tty1
 		mknod /dev/tty1 c 4 1
 		chown root:tty /dev/tty1
 		chmod 600 /dev/tty1
