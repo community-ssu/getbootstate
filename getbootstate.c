@@ -227,7 +227,7 @@ static int get_bsi(void)
        fd = open("/tmp" TWL4030_MADC_PATH, O_RDONLY);
        if (fd < 0) {
           log_msg("Could not open " TWL4030_MADC_PATH " - %s\n", strerror(errno));
-          return -1;
+          return -2;
        }
     }
 
@@ -559,9 +559,11 @@ int main()
     } else if (bsi >= 87 && bsi <= 176) {
         log_msg("Test battery detected\n");
         return_bootstate("TEST", 0, COUNT_BOOTS);
-    } else if (!rdmode && (bsi < 280 || bsi > 568)) {
+    } else if (!rdmode && (bsi < 280 || bsi > 568) && bsi != -2) {
         log_msg("Unknown battery detected. raw bsi value %d\n", bsi);
         return_bootstate("SHUTDOWN", 0, COUNT_BOOTS);
+    } else if (bsi == -2) {
+        log_msg("No interface to read battery type, assuming normal battery\n");
     }
 
 
