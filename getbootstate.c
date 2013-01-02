@@ -58,6 +58,7 @@
 #define BOOT_REASON_SW_RESET        "sw_rst"
 #define BOOT_REASON_RTC_ALARM       "rtc_alarm"
 #define BOOT_REASON_NSU             "nsu"
+#define BOOT_REASON_HW_BUG          "hw_bug"
 
 #define BOOT_MODE_UPDATE_MMC "update"
 #define BOOT_MODE_LOCAL      "local"
@@ -542,6 +543,13 @@ int main()
     }
 
 
+    if (!strcmp(bootreason, BOOT_REASON_HW_BUG)) {
+        log_msg("Hardware bug\n");
+        return_bootstate("MALF",
+                         "SOFTWARE bootloader hardware bug",
+                         COUNT_BOOTS);
+    }
+
     bsi = get_bsi();
     rdmode = get_rdmode();
 
@@ -626,6 +634,7 @@ int main()
     }
 
     if(!strcmp(bootreason, BOOT_REASON_CHARGER) ||
+       !strcmp(bootreason, BOOT_REASON_MBUS) ||
        !strcmp(bootreason, BOOT_REASON_USB))
     {
         log_msg("User attached charger\n");
