@@ -86,6 +86,13 @@ init_system()
 		chown root:tty /dev/tty1
 		chmod 600 /dev/tty1
 	fi
+	if [ ! -c /dev/ttyS0 ]; then
+		rm -f /dev/ttyS0
+		mknod /dev/ttyS0 c 4 64
+		chown root:dialout /dev/ttyS0
+		chmod 660 /dev/ttyS0
+	fi
+	devfs_created=1
 
 	mkdir /tmp/dev
 
