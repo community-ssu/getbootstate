@@ -480,7 +480,7 @@ prepair_boot()
 				root_fsoptions=""
 			fi
 			;;
-		nand|"")
+		flash|nand|"")
 			set_nand_root_params
 			;;
 		off)
