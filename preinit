@@ -573,7 +573,8 @@ enter_state()
 			echo_g "Houston, we have a problem, powering off..."
 			text2screen -c -x 0 -y 0 -h 80 -w 800
 			text2screen -t "Malfunction !" -x 0 -y 0 -s 4
-			text2screen -t "Device shutdown in 10s" -x 0 -y 20 -s 4
+			text2screen -t "$STATE" -x 0 -y 20 -s 4
+			text2screen -t "Device shutdown in 10s" -x 0 -y 40 -s 4
 			sleep 10
 			poweroff
 			def_runlevel=0
