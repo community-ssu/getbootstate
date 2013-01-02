@@ -452,7 +452,7 @@ framebuffer_bootmenu()
 	fi
 }
 
-prepair_boot()
+prepare_boot()
 {
 	if [ "$default_root" = "mmc" ] || [ "$default_root" = "sd" ]; then
 		load_mmc_modules
@@ -606,6 +606,6 @@ serial_bootmenu
 
 framebuffer_bootmenu
 
-prepair_boot
+prepare_boot
 
 boot
