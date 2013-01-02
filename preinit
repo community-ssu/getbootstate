@@ -104,6 +104,9 @@ init_system()
 
 	# set UART timeout to 10s
 	echo 10 > /sys/devices/platform/serial8250.0/sleep_timeout
+
+	# enable cmt_bsi
+	echo active > /sys/devices/platform/gpio-switch/cmt_bsi/state
 }
 
 fini_system()
@@ -546,7 +549,6 @@ prepare_core()
 
 enter_state()
 {
-	echo active > /sys/devices/platform/gpio-switch/cmt_bsi/state
 	STATE=`getbootstate`
 	echo_g "Entering state '$STATE'."
 	case $STATE in
