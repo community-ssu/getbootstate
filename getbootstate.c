@@ -40,7 +40,7 @@
 #define MAX_REBOOT_COUNT_LEN 40
 #define MAX_SAVED_STATE_LEN  40
 
-#define DEFAULT_MAX_BOOTS          10
+#define DEFAULT_MAX_BOOTS          20
 #define DEFAULT_MAX_WD_RESETS       6
 
 #define BOOT_LOOP_COUNT_PATH "/var/lib/dsme/boot_count"
