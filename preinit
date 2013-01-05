@@ -556,7 +556,8 @@ prepare_core()
 
 enter_state()
 {
-	STATE=`getbootstate`
+	STATE_FULL=`getbootstate`
+	STATE=`echo $STATE_FULL | cut -f1 -d' '`
 	echo_g "Entering state '$STATE'."
 	case $STATE in
 		BOOT)
