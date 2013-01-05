@@ -395,7 +395,16 @@ static void read_loop_counts(unsigned* boots, unsigned* wd_resets)
         log_msg("Could not open " BOOT_LOOP_COUNT_PATH ": %s\n",
                 strerror(errno));
     } else {
-        if (fscanf(f, "%u %u", boots, wd_resets) != 2) {
+        // Behaviour from fremantle binary version:
+        // in /var/lib/dsme/boot_count is stored only one number
+        // this file is not used by any other application,
+        // so we can store two numbers to this file in future
+        // if there is only one number store it to both variables
+        if (fscanf(f, "%u", boots) == 1) {
+            if (fscanf(f, "%u", wd_resets) != 1) {
+                *wd_resets = *boots;
+            }
+        } else {
             log_msg("Error reading file " BOOT_LOOP_COUNT_PATH "\n");
         }
         (void)fclose(f);
