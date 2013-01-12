@@ -521,14 +521,16 @@ show_rd_versions()
 	y=$(expr $y + $line_height + $line_height)
 	text2screen -t " no initfs \o/" -s 2 -x $x -y $y -B $bg_color
 
-	y=340
-	text2screen -c -y 320 -x 0 -w 320 -h 120
-	text2screen -t "Component versions:" -x $x -y $y -s 2 -B $bg_color
-	y=$(expr $y + $line_height)
-	while read line ; do
-		text2screen -t "  $line" -x $x -y $y -s 2 -B $bg_color
+	if [ -f /proc/component_version ]; then
+		y=340
+		text2screen -c -y 320 -x 0 -w 320 -h 120
+		text2screen -t "Component versions:" -x $x -y $y -s 2 -B $bg_color
 		y=$(expr $y + $line_height)
-	done < /proc/component_version
+		while read line ; do
+			text2screen -t "  $line" -x $x -y $y -s 2 -B $bg_color
+			y=$(expr $y + $line_height)
+		done < /proc/component_version
+	fi
 }
 
 config_rd_mode()
