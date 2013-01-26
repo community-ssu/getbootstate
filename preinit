@@ -162,9 +162,7 @@ boot()
 load_modules()
 {
 	for mod in $1; do
-		if [ -f $MODULE_PATH/$mod.ko ]; then
-			insmod $MODULE_PATH/$mod.ko
-		fi
+		modprobe $mod
 	done
 }
 
