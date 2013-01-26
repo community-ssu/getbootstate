@@ -110,10 +110,14 @@ init_system()
 	fi
 
 	# set UART timeout to 10s
-	echo 10 > /sys/devices/platform/serial8250.0/sleep_timeout
+	if [ -f /sys/devices/platform/serial8250.0/sleep_timeout ]; then
+		echo 10 > /sys/devices/platform/serial8250.0/sleep_timeout
+	fi
 
 	# enable cmt_bsi
-	echo active > /sys/devices/platform/gpio-switch/cmt_bsi/state
+	if [ -f /sys/devices/platform/gpio-switch/cmt_bsi/state ]; then
+		echo active > /sys/devices/platform/gpio-switch/cmt_bsi/state
+	fi
 }
 
 fini_system()
@@ -455,9 +459,17 @@ serial_bootmenu()
 
 framebuffer_bootmenu()
 {
-	if [ "`cat /sys/devices/platform/gpio-switch/slide/state`" = "open" ] && [ -f /bootmenu.sh ]; then
-		. /bootmenu.sh
+	if [ ! -f /bootmenu.sh ]; then
+		return
 	fi
+
+	if [ -f /sys/devices/platform/gpio-switch/slide/state ]; then
+		if [ "`cat /sys/devices/platform/gpio-switch/slide/state`" != "open" ]; then
+			return
+		fi
+	fi
+
+	. /bootmenu.sh
 }
 
 prepare_boot()
@@ -492,7 +504,9 @@ prepare_boot()
 			set_nand_root_params
 			;;
 		off)
-			echo 0 > /sys/class/backlight/acx565akm/brightness
+			if [ -f /sys/class/backlight/acx565akm/brightness ]; then
+				echo 0 > /sys/class/backlight/acx565akm/brightness
+			fi
 			text2screen -c -B black
 			rm -f /etc/mtab
 			fini_system
