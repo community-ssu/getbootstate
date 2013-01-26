@@ -547,13 +547,6 @@ config_rd_mode()
 	fi
 }
 
-prepare_core()
-{
-	release=`osso_info OSSO_PRODUCT_RELEASE_VERSION`
-	echo "/media/mmc1/core-dumps/%e-%s-%p-$release.core" > /proc/sys/kernel/core_pattern
-	ulimit -c unlimited
-}
-
 enter_state()
 {
 	STATE_FULL=`getbootstate`
@@ -605,8 +598,6 @@ init_system
 read_pmconfig
 
 config_rd_mode
-
-prepare_core
 
 enter_state
 
