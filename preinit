@@ -507,7 +507,7 @@ prepare_boot()
 			if [ -f /sys/class/backlight/acx565akm/brightness ]; then
 				echo 0 > /sys/class/backlight/acx565akm/brightness
 			fi
-			text2screen -c -B black
+			text2screen -c -B 0
 			rm -f /etc/mtab
 			fini_system
 			/etc/init.d/minishutdown
@@ -518,7 +518,7 @@ prepare_boot()
 
 show_rd_versions()
 {
-	bg_color=0xffff
+	bg_color=0xffffff
 	y=0
 	x=0
 	line_height=20
