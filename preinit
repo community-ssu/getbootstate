@@ -518,7 +518,7 @@ prepare_boot()
 
 show_rd_versions()
 {
-	bg_color=0xffffff
+	bg_color=0xffff
 	y=0
 	x=0
 	line_height=20
