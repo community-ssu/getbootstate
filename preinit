@@ -154,7 +154,7 @@ boot()
 		fi
 		fini_system
 		pivot_root . mnt/rootfs
-		CHROOT="/usr/sbin/chroot ."
+		CHROOT="chroot ."
 	else
 		if [ ! -x "$root_init" ]; then
 			echo_g "$root_init not found on root device"
@@ -164,7 +164,7 @@ boot()
 	fi
 
 	# let me see then, what thereat is and this mistery explore
-	/sbin/fiasco-do-update
+	fiasco-do-update
 
 	exec $CHROOT $root_init $def_runlevel <dev/console 1>dev/console 2>&1
 }
