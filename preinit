@@ -567,7 +567,7 @@ config_rd_mode()
 		rd_mode=1
 		echo_g "R&D mode enabled"
 		show_rd_versions
-		if [ $(cal-tool -f | sed 's/,/\n/g' | grep serial-console) = "serial-console" ] ; then
+		if [ "$(cal-tool -f | sed 's/,/\n/g' | grep serial-console)" = "serial-console" ] ; then
 			serial_console=1
 		fi
 	else
