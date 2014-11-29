@@ -72,6 +72,8 @@
 
 #define GETBOOTSTATE_PREFIX "getbootstate: "
 
+#define RX51_BATTERY_PATH "/sys/class/power_supply/rx51-battery/charge_full_design"
+
 
 // TWL_4030_MADC definitions from kernel module twl4030-madc.c
 #define TWL4030_MADC_PATH              "/dev/twl4030-adc"
@@ -221,7 +223,22 @@ static int get_bsi(void)
 {
     int    fd;
     int    ret;
+    char   buf[20];
+    char*  ptr;
     struct twl4030_madc_user_parms par;
+
+    fd = open(RX51_BATTERY_PATH, O_RDONLY);
+    if (fd >= 0) {
+       ret = read(fd, buf, sizeof(buf)-1);
+       close(fd);
+       if (ret > 0) {
+          buf[ret] = 0;
+          ret = strtol(buf, &ptr, 10);
+          if (ret > 0 && ! *ptr )
+             return (1024 * ret)/(1280 * 1200 + ret); // Convert micro voltage to raw BSI value
+       }
+       log_msg("Could not read " RX51_BATTERY_PATH " - %s\n", strerror(errno));
+    }
 
     fd = open(TWL4030_MADC_PATH, O_RDONLY);
     if (fd < 0) {
