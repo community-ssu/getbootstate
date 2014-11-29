@@ -123,6 +123,15 @@ init_system()
 	# enable cmt_bsi
 	if [ -f /sys/devices/platform/gpio-switch/cmt_bsi/state ]; then
 		echo active > /sys/devices/platform/gpio-switch/cmt_bsi/state
+	else
+		if [ -f /sys/class/gpio/export && ! -f /sys/class/gpio/gpio157/value ]; then
+			echo 157 > /sys/class/gpio/export
+			sleep 0.1
+		fi
+		if [ -f /sys/class/gpio/gpio157/value ]; then
+			echo out > /sys/class/gpio/gpio157/direction
+			echo 1 > /sys/class/gpio/gpio157/value
+		fi
 	fi
 }
 
@@ -476,6 +485,17 @@ framebuffer_bootmenu()
 
 	if [ -f /sys/devices/platform/gpio-switch/slide/state ]; then
 		if [ "`cat /sys/devices/platform/gpio-switch/slide/state`" != "open" ]; then
+			return
+		fi
+	fi
+
+	if [ -f /sys/class/gpio/export && ! -f /sys/class/gpio/gpio71/value ]; then
+		echo 71 > /sys/class/gpio/export
+		sleep 0.1
+	fi
+
+	if [ -f /sys/class/gpio/gpio71/value ]; then
+		if [ "`cat /sys/class/gpio/gpio71/value`" != "1" ]; then
 			return
 		fi
 	fi
