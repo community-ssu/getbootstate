@@ -92,6 +92,12 @@ init_system()
 		chown root:dialout /dev/ttyS0
 		chmod 660 /dev/ttyS0
 	fi
+	if [ ! -c /dev/ttyO2 ]; then
+		rm -f /dev/ttyO2
+		mknod /dev/ttyO2 c 251 2
+		chown root:tty /dev/ttyO2
+		chmod 660 /dev/ttyO2
+	fi
 	devfs_created=1
 
 	mkdir /tmp/dev
@@ -374,7 +380,7 @@ start_shell()
 	# job control working (e.g., we want Ctrl-C). With /bin/sh this does
 	# not work, not sure why. Note, "-n -l /bin/sh" options make sure
 	# that username/passeord are not asked for.
-	/sbin/getty 115200 ttyS0 -n -l /bin/sh
+	getty 115200 ttyS0 -n -l /bin/sh || getty 115200 ttyO2 -n -l /bin/sh || /bin/sh
 }
 
 show_roots()
