@@ -188,6 +188,7 @@ load_mmc_modules()
 	sleep 2
 	rm -f /dev/mmcblk*
 	for p in /sys/block/mmcblk*/ /sys/block/mmcblk*/mmcblk*p*/; do
+		if [ ! -e $p ]; then continue; fi
 		n=`basename $p`
 		mknod /dev/$n b `cat $p/dev | sed "s/:/ /g"`
 	done
