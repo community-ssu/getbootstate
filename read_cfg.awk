@@ -1,13 +1,13 @@
 #!/usr/bin/awk
-/enable_off_mode/		{ print $2 > "/sys/power/enable_off_mode" }
-/sleep_while_idle/		{ print $2 > "/sys/power/sleep_while_idle" }
-/sr_vdd1_autocomp/		{ print $2 > "/sys/power/sr_vdd1_autocomp" }
-/sr_vdd2_autocomp/		{ print $2 > "/sys/power/sr_vdd2_autocomp" }
-/clocks_off_while_idle/		{ print $2 > "/sys/power/clocks_off_while_idle" }
-/voltage_off_while_idle/	{ print $2 > "/sys/power/voltage_off_while_idle" }
-/scaling_governor/		{ print $2 > "/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor" }
-/scaling_max_freq/		{ print $2 > "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq" }
-/scaling_min_freq/		{ print $2 > "/sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq" }
+/enable_off_mode/		{ if (system("test -f /sys/power/enable_off_mode") == 0) { print $2 > "/sys/power/enable_off_mode" } }
+/sleep_while_idle/		{ if (system("test -f /sys/power/sleep_while_idle") == 0) { print $2 > "/sys/power/sleep_while_idle" } }
+/sr_vdd1_autocomp/		{ if (system("test -f /sys/power/sr_vdd1_autocomp") == 0) { print $2 > "/sys/power/sr_vdd1_autocomp" } }
+/sr_vdd2_autocomp/		{ if (system("test -f /sys/power/sr_vdd2_autocomp") == 0) { print $2 > "/sys/power/sr_vdd2_autocomp" } }
+/clocks_off_while_idle/		{ if (system("test -f /sys/power/clocks_off_while_idle") == 0) { print $2 > "/sys/power/clocks_off_while_idle" } }
+/voltage_off_while_idle/	{ if (system("test -f /sys/power/voltage_off_while_idle") == 0) { print $2 > "/sys/power/voltage_off_while_idle" } }
+/scaling_governor/		{ if (system("test -f /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor") == 0) { print $2 > "/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor" } }
+/scaling_max_freq/		{ if (system("test -f /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq") == 0) { print $2 > "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq" } }
+/scaling_min_freq/		{ if (system("test -f /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq") == 0) { print $2 > "/sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq" } }
 /sleep_ind/			{
 	if (system("test -f /sys/devices/platform/gpio-switch/sleep_ind/state") == 0) {
 		if ($2 == 1) { VALUE="active" } else { VALUE="inactive" } print VALUE > "/sys/devices/platform/gpio-switch/sleep_ind/state"
