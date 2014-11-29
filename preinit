@@ -215,7 +215,7 @@ set_nand_root_params()
 	root_fstype="ubifs"
 	root_fsoptions="rw,bulk_read,no_chk_data_crc"
 	root_fsmodules=""
-	root_os_name="`osso-info OSSO_PRODUCT_RELEASE_NAME`"
+	root_os_name="`osso_info OSSO_PRODUCT_RELEASE_NAME`"
 	root_init="sbin/init"
 	root_mounted=1
 	def_runlevel=""
