@@ -354,6 +354,10 @@ check_partitions()
 
 start_pty_system()
 {
+	if [ "$have_ptys" = "1" ] ; then
+		return
+	fi
+
 	if [ -e /dev/ptmx ] ; then
 		rm /dev/ptmx
 	fi
