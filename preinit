@@ -517,6 +517,9 @@ prepare_boot()
 			rm -f /etc/mtab
 			fini_system
 			/etc/init.d/minishutdown
+			sleep 10
+			poweroff -f
+			sleep 1000
 			;;
 		esac
 	fi
@@ -599,7 +602,12 @@ enter_state()
 			text2screen -t "$STATE" -x 0 -y 20 -s 4
 			text2screen -t "Device shutdown in 10s" -x 0 -y 40 -s 4
 			sleep 10
-			poweroff
+			rm -f /etc/mtab
+			fini_system
+			/etc/init.d/minishutdown
+			sleep 10
+			poweroff -f
+			sleep 1000
 			def_runlevel=0
 			;;
 	esac
