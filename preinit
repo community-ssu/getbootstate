@@ -658,6 +658,8 @@ set_default_root_params
 
 serial_bootmenu
 
+set_nand_root_params
+
 framebuffer_bootmenu
 
 prepare_boot
