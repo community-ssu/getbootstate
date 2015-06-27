@@ -2,9 +2,9 @@ getbootstate (2.0) fremantle; urgency=low
 
   * New open source version of getbootstate.c (based on harmattan getbootstate.c from dsme tree)
   * New open source version of bsi-read.c
-  * A lot of fixes in preinit
+  * Rewritten preinit script
 
- -- Pali Rohár <pali.rohar@gmail.com>  Tue, 22 Nov 2011 14:51:02 +0100
+ -- Pali Rohár <pali.rohar@gmail.com>  Sat, 27 Jun 2015 12:32:07 +0200
 
 getbootstate (1.0.39+0m5) unstable; urgency=low
 
