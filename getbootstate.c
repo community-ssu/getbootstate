@@ -34,8 +34,11 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <fcntl.h>
-#include <cal.h>
 #include <sys/ioctl.h>
+
+#ifdef WITH_LIBCAL
+#include <cal.h>
+#endif
 
 #define MAX_BOOTREASON_LEN   40
 #define MAX_REBOOT_COUNT_LEN 40
@@ -359,6 +362,7 @@ static int get_bsi(void)
 // If enabled R&D mode return 1 otherwise 0
 static int get_rdmode(void)
 {
+#ifdef WITH_LIBCAL
     struct cal*   cal;
     void*         ptr;
     char*         str;
@@ -380,6 +384,10 @@ static int get_rdmode(void)
         return 0;
     else
         return 1;
+#else
+    // Without libcal force R&D mode
+    return 1;
+#endif
 }
 
 static void log_msg(char* format, ...)
