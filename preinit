@@ -394,7 +394,13 @@ start_shell()
 	# job control working (e.g., we want Ctrl-C). With /bin/sh this does
 	# not work, not sure why. Note, "-n -l /bin/sh" options make sure
 	# that username/passeord are not asked for.
-	getty 115200 ttyS0 -n -l /bin/sh || getty 115200 ttyO2 -n -l /bin/sh || /bin/sh
+	if [ -f /sys/class/tty/ttyO2/dev ]; then
+		getty 115200 ttyO2 -n -l /bin/sh
+	elif [ -f /sys/class/tty/ttyS0/dev ]; then
+		getty 115200 ttyS0 -n -l /bin/sh
+	else
+		/bin/sh
+	fi
 }
 
 show_roots()
