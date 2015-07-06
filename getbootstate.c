@@ -32,6 +32,7 @@
 #include <string.h>
 #include <errno.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <fcntl.h>
 #include <cal.h>
 #include <sys/ioctl.h>
@@ -68,6 +69,7 @@
 #define DEFAULT_CMDLINE_PATH "/proc/cmdline"
 #define BOOT_REASON_PATH     "/proc/bootreason"
 #define COMPONENT_PATH       "/proc/component_version"
+#define ATAGS_PATH           "/proc/atags"
 #define MAX_LINE_LEN         1024
 
 #define GETBOOTSTATE_PREFIX "getbootstate: "
@@ -137,6 +139,90 @@ static int get_cmd_line_value(char* get_value, int max_len, char* key)
     return ret;
 }
 
+static int get_atags_value(char* get_value, int max_len, int type)
+{
+    static char bootreason[12];
+    static char bootmode[12];
+    static int  ret = 1;
+    uint32_t    header[2];
+    uint16_t    header2[2];
+    uint32_t    remind;
+    FILE*       file;
+    char        buf[12];
+    char*       last;
+
+    if (ret != 1) {
+        if (ret == -1)
+            return -1;
+        strncpy(get_value, (type ? bootreason : bootmode), max_len);
+        get_value[max_len-1] = 0;
+        return 0;
+    }
+
+    file = fopen(ATAGS_PATH, "r");
+    if (!file) {
+        ret = -1;
+        return -1;
+    }
+
+    while (fread(header, 4, 2, file) == 2) {
+        if (header[1] == 0)
+            break;
+
+        if (header[1] != 0x414f4d50 || (header[0]<<2) < 4) {
+            fseek(file, (header[0]<<2)-8, SEEK_CUR);
+            continue;
+        }
+
+        remind = (header[0]<<2)-8;
+
+        while (remind > 4) {
+            if (fread(header2, 2, 2, file) != 2)
+                break;
+
+            remind -= 4;
+
+            if (header2[0] == 0)
+                break;
+
+            if (header2[1] > remind || (header2[0] != 0x4f80 && header2[0] != 0x4f82)) {
+                fseek(file, header2[1], SEEK_CUR);
+                continue;
+            }
+
+            if ((header2[0] == 0x4f80 && header2[1] != 12) || (header2[0] == 0x4f82 && header2[1] != 24)) {
+                fseek(file, header2[1], SEEK_CUR);
+                continue;
+            }
+
+            if (header2[0] == 0x4f82) {
+                fread(buf, 1, 12, file);
+                if (strncmp(buf, "boot-mode", strlen("boot-mode"))) {
+                    fseek(file, 12, SEEK_CUR);
+                    continue;
+                }
+            }
+
+            fread((header2[0] == 0x4f80 ? bootreason : bootmode), 1, 12, file);
+
+            last = (header2[0] == 0x4f80 ? bootreason : bootmode);
+            while (*last > ' ')
+                last++;
+            if (*last)
+                *last = 0;
+        }
+
+        fseek(file, remind, SEEK_CUR);
+    }
+
+    fclose(file);
+    ret = 0;
+
+    strncpy(get_value, (type ? bootreason : bootmode), max_len);
+    get_value[max_len-1] = 0;
+    return 0;
+}
+
 // Behaviour from fremantle binary version:
 // bootmode is read from file /proc/component_version
 // file structure: <key> <spaces> <value>
@@ -153,6 +239,9 @@ static int get_bootmode(char* bootmode, int max_len)
     // Try also harmattan behaviour
     cmd = get_cmd_line_value(bootmode, max_len, "bootmode=");
     if (cmd == 0)
+        return 0;
+
+    if (get_atags_value(bootmode, max_len, 0) == 0)
         return 0;
 
     file = fopen(COMPONENT_PATH, "r");
@@ -193,6 +282,9 @@ static int get_bootreason(char* bootreason, int max_len)
     // Try also harmattan behaviour
     cmd = get_cmd_line_value(bootreason, max_len, "bootreason=");
     if (cmd == 0)
+        return 0;
+
+    if (get_atags_value(bootreason, max_len, 1) == 0)
         return 0;
 
     file = fopen(BOOT_REASON_PATH, "r");
