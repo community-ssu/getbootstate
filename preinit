@@ -189,6 +189,9 @@ load_early_modules()
 {
 	# load all modules specified in /etc/early_modules (ignore white space and all after char '#')
 	[ -f /etc/early_modules ] && load_modules "`sed 's/\s*#.*//;s/^\s*//;/^$/d' /etc/early_modules`"
+
+	# load needed modules for booting
+	load_modules rx51_battery
 }
 
 load_mmc_modules()
