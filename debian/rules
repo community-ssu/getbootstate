@@ -6,5 +6,5 @@ clean::
 	$(RM) getbootstate bsi-read
 
 build:
-	$(CC) $(CFLAGS) $(LDFLAGS) -lcal getbootstate.c -o getbootstate
+	$(CC) $(CFLAGS) $(LDFLAGS) -DWITH_LIBCAL -lcal getbootstate.c -o getbootstate
 	$(CC) $(CFLAGS) $(LDFLAGS) bsi-read.c -o bsi-read
