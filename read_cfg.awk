@@ -9,7 +9,7 @@
 /scaling_max_freq/		{ if (system("test -f /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq") == 0) { print $2 > "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq" } }
 /scaling_min_freq/		{ if (system("test -f /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq") == 0) { print $2 > "/sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq" } }
 /sleep_ind/			{
-	if (system("cal-tool --get-rd-mode | grep -q -x 'enabled'") == 0) {
+	if (system("cal-tool --get-rd-mode | grep -q 'enabled'") == 0) {
 		if (system("test -f /sys/devices/platform/gpio-switch/sleep_ind/state") == 0) {
 			if ($2 == 1) { VALUE="active" } else { VALUE="inactive" } print VALUE > "/sys/devices/platform/gpio-switch/sleep_ind/state"
 		} else {
