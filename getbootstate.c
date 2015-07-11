@@ -159,7 +159,7 @@ static int get_atags_value(char* get_value, int max_len, int type)
             return -1;
         strncpy(get_value, (type ? bootreason : bootmode), max_len);
         get_value[max_len-1] = 0;
-        return 0;
+        return get_value[0] ? 0 : -1;
     }
 
     file = fopen(ATAGS_PATH, "r");
@@ -223,7 +223,7 @@ static int get_atags_value(char* get_value, int max_len, int type)
 
     strncpy(get_value, (type ? bootreason : bootmode), max_len);
     get_value[max_len-1] = 0;
-    return 0;
+    return get_value[0] ? 0 : -1;
 }
 
 // Behaviour from fremantle binary version:
