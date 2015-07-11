@@ -173,7 +173,10 @@ static int get_atags_value(char* get_value, int max_len, int type)
             break;
 
         if (header[1] != 0x414f4d50 || (header[0]<<2) < 4) {
-            fseek(file, (header[0]<<2)-8, SEEK_CUR);
+            while (header[0]-- > 2) {
+                if (fread(buf, 4, 1, file) != 1)
+                    break;
+            }
             continue;
         }
 
@@ -189,19 +192,25 @@ static int get_atags_value(char* get_value, int max_len, int type)
                 break;
 
             if (header2[1] > remind || (header2[0] != 0x4f80 && header2[0] != 0x4f82)) {
-                fseek(file, header2[1], SEEK_CUR);
+                while (header2[1]-- > 0) {
+                    if (fread(buf, 1, 1, file) != 1)
+                        break;
+                }
                 continue;
             }
 
             if ((header2[0] == 0x4f80 && header2[1] != 12) || (header2[0] == 0x4f82 && header2[1] != 24)) {
-                fseek(file, header2[1], SEEK_CUR);
+                while (header2[1]-- > 0) {
+                    if (fread(buf, 1, 1, file) != 1)
+                        break;
+                }
                 continue;
             }
 
             if (header2[0] == 0x4f82) {
                 fread(buf, 1, 12, file);
                 if (strncmp(buf, "boot-mode", strlen("boot-mode"))) {
-                    fseek(file, 12, SEEK_CUR);
+                    fread(buf, 1, 12, file);
                     continue;
                 }
             }
@@ -215,7 +224,10 @@ static int get_atags_value(char* get_value, int max_len, int type)
                 *last = 0;
         }
 
-        fseek(file, remind, SEEK_CUR);
+        while (remind-- > 0) {
+            if (fread(buf, 1, 1, file) != 1)
+                break;
+        }
     }
 
     fclose(file);
