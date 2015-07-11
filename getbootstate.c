@@ -329,7 +329,7 @@ static int get_bsi(void)
        if (ret > 0) {
           buf[ret] = 0;
           ret = strtol(buf, &ptr, 10);
-          if (ret > 0 && ! *ptr )
+          if (ret > 0 && *ptr <= 20)
              return (1024 * ret)/(1280 * 1200 + ret); // Convert micro voltage to raw BSI value
        }
        log_msg("Could not read " RX51_BATTERY_PATH " - %s\n", strerror(errno));
