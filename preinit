@@ -653,9 +653,9 @@ read_pmconfig()
 }
 
 
-load_early_modules
-
 init_system
+
+load_early_modules
 
 read_pmconfig
 
