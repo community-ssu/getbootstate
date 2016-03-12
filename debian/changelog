@@ -1,3 +1,11 @@
+getbootstate (2.2) fremantle; urgency=low
+
+  * Fix modem support for upstream kernels
+  * preinit - Load nokia-modem module in load_early_modules
+  * preinit - Call load_early_modules after init_system because modprobe needs /proc/cmdline
+
+ -- Pali Rohár <pali.rohar@gmail.com>  Sat, 12 Mar 2016 13:55:44 +0100
+
 getbootstate (2.1) fremantle; urgency=low
 
   * preinit - Set nand as default boot device for framebuffer bootmenu
