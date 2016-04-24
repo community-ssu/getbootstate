@@ -392,10 +392,9 @@ static int get_rdmode(void)
 
     str = (char *)ptr;
 
-    if (len < 1 || !str[0])
-        return 0;
-    else
-        return 1;
+    ret = (len >= 1 && str[0]);
+    free(ptr);
+    return ret;
 #else
     // Without libcal force R&D mode
     return 1;
