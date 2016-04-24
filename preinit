@@ -86,18 +86,6 @@ init_system()
 		chown root:tty /dev/tty1
 		chmod 600 /dev/tty1
 	fi
-	if [ ! -c /dev/ttyS0 ]; then
-		rm -f /dev/ttyS0
-		mknod /dev/ttyS0 c 4 64
-		chown root:dialout /dev/ttyS0
-		chmod 660 /dev/ttyS0
-	fi
-	if [ ! -c /dev/ttyO2 ]; then
-		rm -f /dev/ttyO2
-		mknod /dev/ttyO2 c 251 2
-		chown root:tty /dev/ttyO2
-		chmod 660 /dev/ttyO2
-	fi
 	devfs_created=1
 
 	mkdir /tmp/dev
@@ -399,8 +387,16 @@ start_shell()
 	# not work, not sure why. Note, "-n -l /bin/sh" options make sure
 	# that username/passeord are not asked for.
 	if [ -f /sys/class/tty/ttyO2/dev ]; then
+		rm -f /dev/ttyO2
+		mknod /dev/ttyO2 c `cat /sys/class/tty/ttyO2/dev | sed "s/:/ /g"`
+		chown root:tty /dev/ttyO2
+		chmod 660 /dev/ttyO2
 		getty 115200 ttyO2 -n -l /bin/sh
 	elif [ -f /sys/class/tty/ttyS0/dev ]; then
+		rm -f /dev/ttyS0
+		mknod /dev/ttyS0 c `cat /sys/class/tty/ttyS0/dev | sed "s/:/ /g"`
+		chown root:dialout /dev/ttyS0
+		chmod 660 /dev/ttyS0
 		getty 115200 ttyS0 -n -l /bin/sh
 	else
 		/bin/sh
