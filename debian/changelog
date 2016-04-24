@@ -1,3 +1,11 @@
+getbootstate (2.3) fremantle; urgency=low
+
+  * preinit - Create /dev/ttyO2 and /dev/ttyS0 devices with correct major:minor numbers
+  * preinit - Check if mmc drivers are not already loaded
+  * getbootstate - Fix memory leak
+
+ -- Pali Rohár <pali.rohar@gmail.com>  Sun, 24 Apr 2016 11:11:01 +0200
+
 getbootstate (2.2) fremantle; urgency=low
 
   * Fix modem support for upstream kernels
