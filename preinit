@@ -196,6 +196,7 @@ load_early_modules()
 
 load_mmc_modules()
 {
+	[ -d /sys/bus/platform/drivers/mmci-omap-hs -o -d /sys/bus/platform/drivers/omap_hsmmc ] && return
 	load_modules "mmc_core mmc_block omap_hsmmc"
 	sleep 2
 	rm -f /dev/mmcblk*
