@@ -495,7 +495,7 @@ framebuffer_bootmenu()
 		fi
 	fi
 
-	if [ -f /sys/class/gpio/export && ! -f /sys/class/gpio/gpio71/value ]; then
+	if [ -f /sys/class/gpio/export ] && [ ! -f /sys/class/gpio/gpio71/value ]; then
 		echo 71 > /sys/class/gpio/export
 		sleep 0.1
 	fi
