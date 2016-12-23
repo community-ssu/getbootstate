@@ -1,3 +1,9 @@
+getbootstate (2.4) fremantle; urgency=low
+
+  * preinit - Fix syntax in framebuffer_bootmenu()
+
+ -- Pali Rohár <pali.rohar@gmail.com>  Fri, 23 Dec 2016 16:33:41 +0100
+
 getbootstate (2.3) fremantle; urgency=low
 
   * preinit - Create /dev/ttyO2 and /dev/ttyS0 devices with correct major:minor numbers
